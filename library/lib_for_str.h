@@ -12,7 +12,9 @@ size_t static len_c_str(const char* cstr);
 
 int my_str_create(my_str_t* str, size_t buf_size);
 
-int my_str_from_cstr(my_str_t* str, const char* cstr, size_t buf_size);
+int new_my_str_from_cstr(my_str_t* str, const char* cstr);
+
+int my_str_from_cstr(my_str_t *str, const char *cstr, size_t buf_size);
 
 void my_str_free(my_str_t* str);
 
@@ -48,6 +50,8 @@ int my_str_cmp(my_str_t* str, const char* from);
 
 int my_str_substr(const my_str_t* str, my_str_t *to, size_t beg, size_t end);
 
+int my_str_substr_cstr(const my_str_t* str, char* to, size_t beg, size_t end);
+
 const char* my_str_get_cstr(my_str_t* str);
 
 size_t my_str_find(const my_str_t* str, const my_str_t* tofind, size_t from);
@@ -65,3 +69,14 @@ int my_str_reorder(my_str_t *str,size_t key_take,size_t key_put);
 void my_str_sort(my_str_t* str);
 
 int my_str_read_word(my_str_t *str, FILE *file);
+
+int my_str_reserve(my_str_t* str, size_t buf_size);
+
+int my_str_shrink_to_fit(my_str_t* str);
+
+int my_str_resize(my_str_t* str, size_t new_size, char sym);
+
+int my_str_read_file_delim(my_str_t* str, FILE* file, char delimiter);
+
+
+

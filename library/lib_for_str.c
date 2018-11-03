@@ -1,6 +1,14 @@
 #include "lib_for_str.h"
 #include <stdlib.h>
 
+// TODO: functions with todos
+//! Наступні функції, якщо буфер замалий, розширяють його
+//! за допомогою виклику my_str_reserve(),
+//! (а не повертають помилку, як раніше).
+//! Розумним є буфер кожного разу збільшувати в 1.8-2 рази.
+
+
+
 //! Обчислює розмір С-стрічки
 //! приймає вказівник на перший символ (назва масиву)
 size_t static len_c_str(const char *cstr) {
@@ -34,6 +42,15 @@ int my_str_create(my_str_t *str, size_t buf_size) {
 //! менший за її розмір -- вважати помилкою.
 //! Пам'ять виділяється динамічно.
 //! 0 -- якщо все ОК, -1 -- недостатній розмір буфера, -2 -- не вдалося виділити пам'ять
+
+//! Замість:
+//! int my_str_from_cstr(my_str_t* str, const char* cstr, size_t buf_size);
+//! настуна функція, яка збільшує стрічку до потрібного розміру:
+int new_my_str_from_cstr(my_str_t* str, const char* cstr) {
+    // Sofiya
+    return 0;
+}
+// todo: стара функція!!! переписати!
 int my_str_from_cstr(my_str_t *str, const char *cstr, size_t buf_size) {
     size_t len = len_c_str(cstr);
     if (buf_size == 0) {
@@ -98,6 +115,9 @@ int my_str_getc(const my_str_t *str, size_t index) {
 //! Записує символ у вказану позиції (заміняючи той, що там був),
 //! Повертає 0, якщо позиція в межах стрічки,
 //! Поветає -1, не змінюючи її вмісту, якщо ні.
+
+//! Увага! Функція my_str_putc() залишається незмінною -- вона
+//! повинна повернути помилку, якщо розмір стрічки замалий.
 int my_str_putc(my_str_t *str, size_t index, char c) {
     if (0 <= index < str->size_m) {
         *(str->data + index) = c;
@@ -108,6 +128,9 @@ int my_str_putc(my_str_t *str, size_t index, char c) {
 
 //! Додає символ в кінець.
 //! Повертає 0, якщо успішно, -1, якщо буфер закінчився.
+// TODO: change this function!
+// Nastia
+// int my_str_pushback(my_str_t* str, char c);
 int my_str_pushback(my_str_t *str, char c) {
     if (str->size_m < str->capacity_m) {
         *(str->data + str->size_m) = c;
@@ -134,6 +157,9 @@ int my_str_popback(my_str_t *str) {
 //! то із тим же розміром буферу, що й вихідна,
 //! інакше -- із буфером мінімального достатнього розміру.
 //! Старий вміст стрічки перед тим звільняє, за потреби.
+// int my_str_copy(const my_str_t* from,  my_str_t* to, int reserve);
+// TODO: change this function
+// Sofiya
 int my_str_copy(const my_str_t *from, my_str_t *to, int reserve) {
     if (from->capacity_m != to->capacity_m) {
         if (reserve || (from->size_m > to->capacity_m)) {
@@ -165,6 +191,9 @@ void my_str_clear(my_str_t *str) {
 
 //! Вставити символ у стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
+// TODO: change this function
+// Nastia
+// int my_str_insert_c(my_str_t* str, char c, size_t pos);
 int my_str_insert_c(my_str_t *str, char c, size_t pos) {
     if (pos > str->size_m) { pos = str->size_m; }
 
@@ -187,6 +216,9 @@ int my_str_insert_c(my_str_t *str, char c, size_t pos) {
 
 //! Вставити стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
+// TODO: change this function
+// Oksi
+// int my_str_insert(my_str_t* str, const my_str_t* from, size_t pos);
 int my_str_insert(my_str_t *str, const my_str_t *from, size_t pos) {
     if (pos > str->size_m) { pos = str->size_m; }
 
@@ -206,6 +238,9 @@ int my_str_insert(my_str_t *str, const my_str_t *from, size_t pos) {
 
 //! Вставити C-стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
+// TODO: change this function
+// Yarka
+// int my_str_insert_cstr(my_str_t* str, const char* from, size_t pos);
 int my_str_insert_cstr(my_str_t *str, const char *from, size_t pos) {
     size_t size_from = len_c_str(from);
     if (pos > str->size_m) { pos = str->size_m; }
@@ -225,6 +260,9 @@ int my_str_insert_cstr(my_str_t *str, const char *from, size_t pos) {
 
 //! Додати стрічку в кінець.
 //! Якщо це неможливо, повертає -1, інакше 0.
+// TODO: change this function
+// Sofiya
+// int my_str_append(my_str_t* str, const my_str_t* from);
 int my_str_append(my_str_t *str, const my_str_t *from) {
     if (str->size_m + from->size_m <= str->capacity_m) {
         char *pstr = str->data + str->size_m;
@@ -242,6 +280,9 @@ int my_str_append(my_str_t *str, const my_str_t *from) {
 
 //! Додати С-стрічку в кінець.
 //! Якщо це неможливо, повертає -1, інакше 0.
+// TODO: change this function
+// Oksi
+// int my_str_append_cstr(my_str_t* str, const char* from);
 int my_str_append_cstr(my_str_t *str, const char *from) {
     if (str->size_m + len_c_str(from) <= str->capacity_m) {
         char *pstr = str->data + str->size_m;
@@ -285,6 +326,9 @@ int my_str_cmp(my_str_t *str, const char *from) {
 //! Якщо end виходить за межі str -- скопіювати скільки вдасться, не вважати
 //! це помилкою. Якщо ж в ціловій стрічці замало місця, або beg більший
 //! за розмір str -- це помилка. Повернути відповідний код завершення.
+// TODO: change this function
+// Oksi
+// int my_str_substr(const my_str_t* str, my_str_t* to, size_t beg, size_t end);
 int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end) {
     if (((end - beg) > to->capacity_m) || (beg > str->size_m)) {
         return -1;
@@ -298,6 +342,15 @@ int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end) {
         }
     }
     *(to->data + end - beg) = '\0';
+    return 0;
+}
+
+
+//! Її C-string варіант. Враховуючи пізні зміни інтерфейсу, прийнятним
+//! Буде і попередній варіант.
+// TODO: write this function
+// Yarka
+int my_str_substr_cstr(const my_str_t* str, char* to, size_t beg, size_t end) {
     return 0;
 }
 
@@ -467,5 +520,46 @@ int my_str_reorder(my_str_t *str, size_t key_take, size_t key_put) {
         *p1 = temp;
         temp = value;
     }
+    return 0;
+}
+
+
+//! Збільшує буфер стрічки, із збереженням вмісту,
+//! якщо новий розмір більший за попередній,
+//! не робить нічого, якщо менший або рівний.
+//! (Як показує практика, це -- корисний підхід).
+//! Для збільшення виділяє новий буфер, копіює вміст
+//! стрічки (size_m символів -- немає сенсу копіювати
+//! решту буфера) із старого буфера та звільняє його.
+int my_str_reserve(my_str_t* str, size_t buf_size) {
+    // Sofiya
+    return 0;
+}
+
+//! Робить буфер розміром, рівний необхідному:
+//! так, щоб capacity_m == size_t. Єдиний "офіційний"
+//! спосіб зменшити фактичний розмір буфера.
+int my_str_shrink_to_fit(my_str_t* str) {
+    // Nastia
+    return 0;
+}
+
+//! Якщо new_size менший за поточний розмір -- просто
+//! відкидає зайві символи (зменшуючи size_m). Якщо
+//! більший -- збільшує фактичний розмір стрічки,
+//! встановлюючи нові символи рівними sym.
+//! За потреби, збільшує буфер.
+//! Сподіваюся, різниця між розміром буфера та фактичним
+//! розміром стрічки зрозуміла?
+int my_str_resize(my_str_t* str, size_t new_size, char sym) {
+    // Yarka
+    return 0;
+}
+
+//! На відміну від my_str_read_file(), яка читає по
+//! whitespace, читає по вказаний delimiter, за потреби
+//! збільшує стрічку.
+int my_str_read_file_delim(my_str_t* str, FILE* file, char delimiter) {
+    // Oksi
     return 0;
 }
