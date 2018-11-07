@@ -605,7 +605,8 @@ int my_str_resize(my_str_t *str, size_t new_size, char sym) {
 //! збільшує стрічку.
 int my_str_read_file_delim(my_str_t *str, FILE *file, char delimiter) {
     char c = (char) getc(file);
-    while (c != delimiter && c) {
+    while (c != delimiter && c != EOF) {
+        printf("%c", c);
         if (my_str_pushback(str, c)) {
             return -1;
         }
