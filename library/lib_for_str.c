@@ -130,8 +130,10 @@ int my_str_putc(my_str_t *str, size_t index, char c) {
 //! Додає символ в кінець.
 //! Повертає 0, якщо успішно, -1, якщо буфер закінчився.
 int my_str_pushback(my_str_t *str, char c) {
-    while (str->size_m > str->capacity_m) {
-        if (my_str_reserve(str, str->capacity_m * 2)) { return -1; }
+    while (str->size_m >= str->capacity_m) {
+        if (my_str_reserve(str, str->capacity_m * 2)) {
+            return -1;
+        }
     }
     
     *(str->data + str->size_m) = c;
@@ -190,9 +192,9 @@ void my_str_clear(my_str_t *str) {
 //! Вставити символ у стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
 int my_str_insert_c(my_str_t *str, char c, size_t pos) {
-    if (pos > str->size_m) { pos = str->size_m; }
+    if (pos >= str->size_m) { pos = str->size_m; }
 
-    while (str->size_m > str->capacity_m) {
+    while (str->size_m >= str->capacity_m) {
         if (my_str_reserve(str, str->capacity_m * 2)) { return -1; }
     }
 
@@ -326,7 +328,7 @@ int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end) {
     if (beg > str->size_m) {
         return -1;
     }
-    while ((end - beg) > to->capacity_m) {
+    while ((end - beg) >= to->capacity_m) {
         if (my_str_reserve(to, 2*to->capacity_m)){
             return -1;
         }
@@ -544,7 +546,6 @@ int my_str_reserve(my_str_t *str, size_t buf_size) {
 
         // create template for new stt
         char *data1 = (char*) malloc(sizeof(char) * (buf_size + 1));
-        //printf("reserve: %p %c\n", (void*)data1, *data1);
 
         if (!data1) {
             return -1;

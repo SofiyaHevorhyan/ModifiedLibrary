@@ -5,5 +5,5 @@ set(CMAKE_C_STANDARD 99)
 set(LIB_SRC library/lib_for_str.c)
 
 add_library(mylib SHARED ${LIB_SRC})
-add_executable(create_library main.c file_read.c file_read.h)
+add_executable(create_library main.c file_read.c file_read.h testing_simple_functions.c)
 target_link_libraries(${PROJECT_NAME} mylib)
