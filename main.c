@@ -4,6 +4,7 @@
 int static compare(char c);
 
 int main(int argc, char *argv[]) {
+
     if (argc != 3) {
         printf("Number of arguments must be 3 (program name, file_in, file_out.");
         return -1;
@@ -124,7 +125,7 @@ int main(int argc, char *argv[]) {
     my_str_create(&str13, 1024);
     const char str13_c[128] = "BA girl";
     my_str_from_cstr(&str13, str13_c);
-
+    printf("%slllllllllllllllllll\n", str13.data);
     printf("Strings %s and %s are equal: %d.\n\n", str13.data, str13_c, my_str_cmp(&str13, str13_c));
     printf("Inserted 's' into the position 16 in string '%s': ", str13.data);
     my_str_insert_c(&str13, 's', 16);
@@ -134,17 +135,26 @@ int main(int argc, char *argv[]) {
     my_str_t str14;
     my_str_create(&str14, 1024);
     const char *str14_c = " are here";
+
     my_str_from_cstr(&str14, str14_c);
 
     my_str_insert(&str13, &str14, (size_t)-5);
     printf("%s\n", str13.data);
-
+    printf("looooool");
     printf("Inserted C string 'trying to study POK' in into the position 13 in string '%s': ", str13.data);
-    my_str_insert_cstr(&str13, "trying to study POK ", 13);
+    my_str_insert(&str13, "trying to study POK ", 10);
     printf("%s\n", str13.data);
 
     printf("Now run function that uses our library.\n");
     read_write(file_read, file_write);
+//    TODO check it
+//    my_str_t str15;
+//    my_str_create(&str14, 1024);
+//    const char *str15_c = "We did it... ";
+//    my_str_from_cstr(&str14, str14_c);
+//    my_str_resize(&str15, 18, 'a');
+//    printf("%s\n", &str15);
+
     printf("Created by Sofiya, Oksana, Yarka, Anastasia.\nWith love <3.");
 
 
@@ -159,7 +169,6 @@ int main(int argc, char *argv[]) {
     my_str_free(&str13);
 
     return 0;
-
 }
 
 int static compare(char c) {
