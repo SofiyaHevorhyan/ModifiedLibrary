@@ -213,8 +213,8 @@ int main(int argc, char *argv[]) {
     printf("Created string: %s\n", str23.data);
     printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
     printf("Insert a symbol on the position 1: ");
-    (my_str_insert_c(&str23, 'e', 1));
-    printf("tut %s\n", str23.data);
+    my_str_insert_c(&str23, 'e', 1);
+    printf("%s\n", str23.data);
     printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
     //----------------------------------------------------------------------------------------
 
