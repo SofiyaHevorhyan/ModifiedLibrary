@@ -47,7 +47,7 @@ int my_str_create(my_str_t *str, size_t buf_size) {
 //! int my_str_from_cstr(my_str_t* str, const char* cstr, size_t buf_size);
 //! настуна функція, яка збільшує стрічку до потрібного розміру:
 
-int my_str_from_cstr(my_str_t* str, const char* cstr) {
+int my_str_from_cstr(my_str_t *str, const char *cstr) {
 
     size_t len = len_c_str(cstr);
 
@@ -71,31 +71,6 @@ int my_str_from_cstr(my_str_t* str, const char* cstr) {
     *pstr = '\0';
 
     return 0;
-}
-
-int old_my_str_from_cstr(my_str_t *str, const char *cstr, size_t buf_size) {
-    size_t len = len_c_str(cstr);
-    if (buf_size == 0) {
-        buf_size = len;
-    }
-
-    if (buf_size < len) {
-        return -1;
-    }
-    my_str_free(str);
-    int status = my_str_create(str, buf_size);
-    if (!status) {
-        const char *ps = cstr;
-        char *pstr = str->data;
-
-        while (*ps++ != '\0') {
-            *pstr++ = *(ps - 1);
-            str->size_m++;
-        }
-        *pstr = '\0';
-        return 0;
-    }
-    return -2;
 }
 
 
@@ -263,9 +238,10 @@ int my_str_insert(my_str_t *str, const my_str_t *from, size_t pos) {
 int my_str_insert_cstr(my_str_t *str, const char *from, size_t pos) {
     size_t size_from = len_c_str(from);
     if (pos > str->size_m) { pos = str->size_m; }
-    while (size_from + str->size_m <= str->capacity_m){
+    while (size_from + str->size_m >= str->capacity_m) {
         my_str_reserve(str, str->capacity_m * 2);
     }
+
     for (size_t i = str->size_m + 2 * size_from; i >= pos + size_from; i--) {
         *(str->data + i) = *(str->data + i - size_from);
     }
@@ -281,8 +257,8 @@ int my_str_insert_cstr(my_str_t *str, const char *from, size_t pos) {
 int my_str_append(my_str_t *str, const my_str_t *from) {
     if (str->size_m + from->size_m > str->capacity_m) {
 
-        size_t buf_size = 2*str->capacity_m;
-        if (from->size_m > 2*str->capacity_m) {
+        size_t buf_size = 2 * str->capacity_m;
+        if (from->size_m > 2 * str->capacity_m) {
             buf_size = from->size_m;
         }
         int status = my_str_reserve(str, buf_size);
@@ -372,8 +348,6 @@ int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end) {
 
 //! Її C-string варіант. Враховуючи пізні зміни інтерфейсу, прийнятним
 //! Буде і попередній варіант.
-// TODO: write this function
-// Yarka
 int my_str_substr_cstr(const my_str_t *str, char *to, size_t beg, size_t end) {
     if (beg > str->size_m || end < beg) {
         return -1;
@@ -566,7 +540,7 @@ int my_str_reorder(my_str_t *str, size_t key_take, size_t key_put) {
 //! решту буфера) із старого буфера та звільняє його.
 // 0 for successful reserving buffer or all the same (no need to reserve)
 // -1 for smth went wrong
-int my_str_reserve(my_str_t* str, size_t buf_size) {
+int my_str_reserve(my_str_t *str, size_t buf_size) {
 
     if (str->capacity_m < buf_size) {
 
@@ -574,6 +548,7 @@ int my_str_reserve(my_str_t* str, size_t buf_size) {
         char *data1 = (char *) malloc(sizeof(char) * (buf_size + 1));
 
         if (!data1) {
+            printf("\nErrooooor\n");
             return -1;
         }
 
@@ -610,8 +585,7 @@ int my_str_shrink_to_fit(my_str_t *str) {
 //! Сподіваюся, різниця між розміром буфера та фактичним
 //! розміром стрічки зрозуміла?)
 int my_str_resize(my_str_t *str, size_t new_size, char sym) {
-    // Yarka
-    while (str->capacity_m < new_size){
+    while (str->capacity_m < new_size) {
         my_str_reserve(str, str->capacity_m * 2);
     }
 
