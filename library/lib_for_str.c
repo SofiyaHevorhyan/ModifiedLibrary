@@ -573,8 +573,8 @@ int my_str_reserve(my_str_t *str, size_t buf_size) {
 //! Робить буфер розміром, рівний необхідному:
 //! так, щоб capacity_m == size_t. Єдиний "офіційний"
 //! спосіб зменшити фактичний розмір буфера.
-int my_str_shrink_to_fit(my_str_t *str) {
-    // Nastia
+int my_str_shrink_to_fit(my_str_t* str) {
+    str->capacity_m = str->size_m;
     return 0;
 }
 
