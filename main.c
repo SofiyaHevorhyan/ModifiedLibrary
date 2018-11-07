@@ -181,6 +181,42 @@ int main(int argc, char *argv[]) {
     printf("buffer after reserve - %d ", my_str_capacity(&new_str));
     printf("String: %s\n", new_str.data);
 
+    // TODO: але якщо минулі тести в інший файл кидати будемо то str22 і str23 можна і перейменувати норм
+    // а так то тести до тих двох ф-цій готові :-)
+    // ------------------------------- pushback ---------------------------------------------
+    printf("Testing pushback function...\n");
+    my_str_t str22;
+    my_str_create(&str22, 7);
+
+    const char *word = "Student";
+    my_str_from_cstr(&str22, word);
+
+    printf("Created string: %s\n", str22.data);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str22), my_str_capacity(&str22));
+
+    printf("Added a symbol to the end: ");
+    my_str_pushback(&str22, 's');
+    printf("%s\n", str22.data);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str22), my_str_capacity(&str22));
+    printf("\n");
+    //----------------------------------------------------------------------------------------
+
+
+    // ------------------------------insert_c function----------------------------------------
+    printf("Testing insert_c function...\n");
+    my_str_t str23;
+    my_str_create(&str23, 4);
+
+    const char *word2 = "Mow!";
+    my_str_from_cstr(&str23, word2);
+
+    printf("Created string: %s\n", str23.data);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
+    printf("Insert a symbol on the position 1: ");
+    (my_str_insert_c(&str23, 'e', 1));
+    printf("tut %s\n", str23.data);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
+    //----------------------------------------------------------------------------------------
 
 
 
