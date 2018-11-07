@@ -234,25 +234,24 @@ int my_str_insert_c(my_str_t *str, char c, size_t pos) {
 }
 
 //! Вставити стрічку в заданій позиції, змістивши решту символів праворуч.
-//! Якщо це неможливо, повертає -1, інакше 0.
 // TODO: change this function
-// Oksi
-// int my_str_insert(my_str_t* str, const my_str_t* from, size_t pos);
 int my_str_insert(my_str_t *str, const my_str_t *from, size_t pos) {
     if (pos > str->size_m) { pos = str->size_m; }
 
-    if (from->size_m + str->size_m <= str->capacity_m) {
-        for (size_t i = str->size_m + from->size_m + 1; i >= pos + from->size_m; i--) {
-            *(str->data + i) = *(str->data + i - from->size_m);
+    while (from->size_m + str->size_m > str->capacity_m) {
+        if (my_str_reserve(str, 2 * str->capacity_m)) {
+            return -1;
         }
-        for (size_t i = 0; i < from->size_m; i++) {
-            *(str->data + pos + i) = *(from->data + i);
-        }
-
-        str->size_m += from->size_m;
-        return 0;
     }
-    return -1;
+    for (size_t i = str->size_m + from->size_m + 1; i >= pos + from->size_m; i--) {
+        *(str->data + i) = *(str->data + i - from->size_m);
+    }
+    for (size_t i = 0; i < from->size_m; i++) {
+        *(str->data + pos + i) = *(from->data + i);
+    }
+
+    str->size_m += from->size_m;
+    return 0;
 }
 
 //! Вставити C-стрічку в заданій позиції, змістивши решту символів праворуч.
@@ -306,10 +305,15 @@ int my_str_append(my_str_t *str, const my_str_t *from) {
 //! Додати С-стрічку в кінець.
 //! Якщо це неможливо, повертає -1, інакше 0.
 // TODO: change this function
-// Oksi
-// int my_str_append_cstr(my_str_t* str, const char* from);
 int my_str_append_cstr(my_str_t *str, const char *from) {
-    if (str->size_m + len_c_str(from) <= str->capacity_m) {
+    int status = 0;
+    if (str->size_m + len_c_str(from) > str->capacity_m) {
+        status = my_str_reserve(str, 2 * str->capacity_m);
+    }
+    if (str->size_m + len_c_str(from) > str->capacity_m) {
+        status = my_str_reserve(str, str->size_m + len_c_str(from));
+    }
+    if (!status) {
         char *pstr = str->data + str->size_m;
         const char *pfrom = from;
 
@@ -349,14 +353,15 @@ int my_str_cmp(my_str_t *str, const char *from) {
 
 //! Скопіювати підстрічку, із beg включно, по end не включно ([beg, end)).
 //! Якщо end виходить за межі str -- скопіювати скільки вдасться, не вважати
-//! це помилкою. Якщо ж в ціловій стрічці замало місця, або beg більший
+//! це помилкою. Якщо ж в ціловій стрічці замало місця - збільшити розмір буферу, якщо beg більший
 //! за розмір str -- це помилка. Повернути відповідний код завершення.
 // TODO: change this function
-// Oksi
-// int my_str_substr(const my_str_t* str, my_str_t* to, size_t beg, size_t end);
 int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end) {
-    if (((end - beg) > to->capacity_m) || (beg > str->size_m)) {
+    if (beg > str->size_m) {
         return -1;
+    }
+    while (to->capacity_m < (end - beg)) {
+        my_str_reserve(to, 2*to->capacity_m);
     }
     to->size_m = 0;
     for (size_t i = beg; i < end; i++) {
@@ -375,7 +380,18 @@ int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end) {
 //! Буде і попередній варіант.
 // TODO: write this function
 // Yarka
-int my_str_substr_cstr(const my_str_t* str, char* to, size_t beg, size_t end) {
+int my_str_substr_cstr(const my_str_t *str, char *to, size_t beg, size_t end) {
+    if (beg > str->size_m) {
+        return -1;
+    }
+    for (size_t i = beg; i < end; i++) {
+
+        *(to + i - beg) = *(str->data + i);
+        if (*(str->data + i) == '\0') {
+            break;
+        }
+    }
+    *(to + end - beg) = '\0';
     return 0;
 }
 
