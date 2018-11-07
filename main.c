@@ -85,7 +85,6 @@ int main(int argc, char *argv[]) {
 
     my_str_t reading;
     my_str_create(&reading, 7);
-    printf("%s", file_read);
     FILE *file = fopen(file_read, "r");
     if (file == NULL) {
         printf("\nEmpty file to read str! \n");
