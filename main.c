@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
     printf("String to which str3 was appended: %s\n", str4.data);
 
     printf("Appending C string to the end of another string...\n");
-    const char *str5_c = " very much";
+    const char *str5_c = " very-very-very much";
     printf("%s| %s ljl\n", str4.data, str5_c);
     my_str_append_cstr(&str4, str5_c);
     printf("String to which str3 was appended: %s\n", str4.data);
@@ -221,6 +221,7 @@ int main(int argc, char *argv[]) {
 
 
     printf("Created by Sofiya, Oksana, Yarka, Anastasia.\nWith love <3.");
+
 
 
     return 0;
