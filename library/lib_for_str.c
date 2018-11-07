@@ -55,7 +55,11 @@ int my_str_from_cstr(my_str_t *str, const char *cstr) {
         // make clear in case non-empty str to optimize time for reserve
         // old values will be lost anyway
         my_str_clear(str);
-        int status = my_str_reserve(str, 2 * str->capacity_m);
+        size_t buf_size = 2*str->capacity_m;
+        if (len > buf_size) {
+            buf_size = len;
+        }
+        int status = my_str_reserve(str, buf_size);
         if (status) {
             return -2;
         }
@@ -255,11 +259,12 @@ int my_str_insert_cstr(my_str_t *str, const char *from, size_t pos) {
 int my_str_append(my_str_t *str, const my_str_t *from) {
     if (str->size_m + from->size_m > str->capacity_m) {
 
-        size_t buf_size = 2 * str->capacity_m;
-        if (from->size_m > 2 * str->capacity_m) {
-            buf_size = from->size_m;
+        size_t buf_size = 2*str->capacity_m;
+        if (from->size_m + str->size_m > 2*str->capacity_m) {
+            buf_size = from->size_m + str->size_m;
         }
         int status = my_str_reserve(str, buf_size);
+
         if (status) {
             return -1;
         }
@@ -279,6 +284,7 @@ int my_str_append(my_str_t *str, const my_str_t *from) {
 //! Додати С-стрічку в кінець.
 //! Якщо це неможливо, повертає -1, інакше 0.
 // TODO: change this function
+// todo: check if tests in main are correct
 // Oksi
 // int my_str_append_cstr(my_str_t* str, const char* from);
 int my_str_append_cstr(my_str_t *str, const char *from) {
@@ -543,10 +549,10 @@ int my_str_reserve(my_str_t *str, size_t buf_size) {
     if (str->capacity_m < buf_size) {
 
         // create template for new stt
-        char *data1 = (char *) malloc(sizeof(char) * (buf_size + 1));
+        char *data1 = (char*) malloc(sizeof(char) * (buf_size + 1));
+        //printf("reserve: %p %c\n", (void*)data1, *data1);
 
         if (!data1) {
-            printf("\nErrooooor\n");
             return -1;
         }
 

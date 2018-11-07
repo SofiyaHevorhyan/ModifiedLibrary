@@ -10,7 +10,7 @@ int read_write(const char *file_read, const char *file_write) {
     FILE *file = fopen(file_read, "r");
 
     if (file == NULL) {
-        printf("Empty file");
+        printf("Empty file\n");
         return -1;
     }
     my_str_t str;
