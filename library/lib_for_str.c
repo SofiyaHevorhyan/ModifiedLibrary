@@ -129,17 +129,17 @@ int my_str_putc(my_str_t *str, size_t index, char c) {
 
 //! Додає символ в кінець.
 //! Повертає 0, якщо успішно, -1, якщо буфер закінчився.
-// TODO: change this function!
-// Nastia
 // int my_str_pushback(my_str_t* str, char c);
 int my_str_pushback(my_str_t *str, char c) {
-    if (str->size_m < str->capacity_m) {
-        *(str->data + str->size_m) = c;
-        *(str->data + str->size_m + 1) = '\0';
-        str->size_m++;
-        return 0;
+    while (str->size_m >= str->capacity_m) {
+        my_str_reserve(str, str->capacity_m * 2);
     }
-    return -1;
+    
+    *(str->data + str->size_m) = c;
+    *(str->data + str->size_m + 1) = '\0';
+    str->size_m++;
+
+    return 0;
 }
 
 //! Викидає символ з кінця.
@@ -190,27 +190,24 @@ void my_str_clear(my_str_t *str) {
 
 //! Вставити символ у стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
-// TODO: change this function
-// Nastia
 // int my_str_insert_c(my_str_t* str, char c, size_t pos);
 int my_str_insert_c(my_str_t *str, char c, size_t pos) {
     if (pos > str->size_m) { pos = str->size_m; }
 
-    if (str->size_m < str->capacity_m) {
-
-        char *p = str->data + pos;
-        char x1 = c, x2 = *p;
-
-        while (p <= str->data + str->size_m) {
-            *p = x1;
-            x1 = x2;
-            x2 = *(++p);
-        }
-        *p = '\0';
-        str->size_m += 1;
-        return 0;
+    while (str->size_m >= str->capacity_m) {
+        my_str_reserve(str, str->capacity_m * 2);
     }
-    return -1;
+
+    char* p = str->data + pos;
+    char x1 = c, x2 = *p;
+    while(p <= str->data + str->size_m){
+        *p  = x1;
+        x1 = x2;
+        x2 = *(++p);
+    }
+    *p = '\0';
+    str->size_m += 1;
+    return 0;
 }
 
 //! Вставити стрічку в заданій позиції, змістивши решту символів праворуч.
