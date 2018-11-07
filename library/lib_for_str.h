@@ -12,9 +12,9 @@ size_t static len_c_str(const char* cstr);
 
 int my_str_create(my_str_t* str, size_t buf_size);
 
-int new_my_str_from_cstr(my_str_t* str, const char* cstr);
+int my_str_from_cstr(my_str_t* str, const char* cstr);
 
-int my_str_from_cstr(my_str_t *str, const char *cstr, size_t buf_size);
+int old_my_str_from_cstr(my_str_t *str, const char *cstr, size_t buf_size);
 
 void my_str_free(my_str_t* str);
 

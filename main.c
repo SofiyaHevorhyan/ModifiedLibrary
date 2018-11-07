@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     printf("%s\n", line);
 
     printf("Recreating string from C string with buffer 6...\n");
-    my_str_from_cstr(&str, line, 128);
+    my_str_from_cstr(&str, line);
     printf("Created string: %s\n", str.data);
     if (my_str_empty(&str) == 1) {
         printf("Size of the string is %d, size of the buffer is %d, it is empty: %s.\n", my_str_size(&str),
@@ -40,10 +40,11 @@ int main(int argc, char *argv[]) {
     my_str_free(&str);
     printf("Freeing string...\nSize of the string is %d and size of the buffer is %d.\n\n", my_str_size(&str),my_str_capacity(&str));
     printf("Creating a new string...\n");
+
     my_str_t str2;
     my_str_create(&str2, 128);
     const char *str2_c = "R love POK";
-    my_str_from_cstr(&str2, str2_c, 32);
+    my_str_from_cstr(&str2, str2_c);
     printf("Created string: %s\n", str2.data);
 
     printf("Getting char at the position 3 is %c.\n", (char) my_str_getc(&str2, (size_t) 3));
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
     my_str_t str3;
     my_str_create(&str3, 30);
     const char *str3_c = "I do not love POK";
-    my_str_from_cstr(&str3, str3_c, 128);
+    my_str_from_cstr(&str3, str3_c);
 
     printf("Copying string with saving buffer size of the copied string...\n");
     printf("String to which str2 will be copied: %s\n", str3.data);
@@ -75,7 +76,7 @@ int main(int argc, char *argv[]) {
     my_str_t str4;
     my_str_create(&str4, 3);
     const char *str4_c = "I am a BA girl. ";
-    my_str_from_cstr(&str4, str4_c, 128);
+    my_str_from_cstr(&str4, str4_c);
 
     my_str_append(&str4, &str3);
     printf("String to which str3 was appended: %s\n", str4.data);
@@ -92,13 +93,13 @@ int main(int argc, char *argv[]) {
     my_str_t str6;
     my_str_create(&str6, 10);
     const char *test_line = "BAgirls";
-    my_str_from_cstr(&str6, test_line, 7);
+    my_str_from_cstr(&str6, test_line);
 
     printf("Number of element 'A' in string '%s': %d\n\n", str6.data, my_str_find_if(&str6, &compare));
 
     my_str_t str7;
     my_str_create(&str7, 3);
-    my_str_from_cstr(&str7, "BA", 10);
+    my_str_from_cstr(&str7, "BA");
     printf("Index of the first substring 'BA' in %s: %d\n", str6.data, my_str_find(&str6, &str7, 0));
 
     my_str_t str8;
@@ -122,7 +123,7 @@ int main(int argc, char *argv[]) {
     my_str_t str13;
     my_str_create(&str13, 1024);
     const char str13_c[128] = "BA girl";
-    my_str_from_cstr(&str13, str13_c, 128);
+    my_str_from_cstr(&str13, str13_c);
 
     printf("Strings %s and %s are equal: %d.\n\n", str13.data, str13_c, my_str_cmp(&str13, str13_c));
     printf("Inserted 's' into the position 16 in string '%s': ", str13.data);
@@ -133,9 +134,9 @@ int main(int argc, char *argv[]) {
     my_str_t str14;
     my_str_create(&str14, 1024);
     const char *str14_c = " are here";
-    my_str_from_cstr(&str14, str14_c, 128);
+    my_str_from_cstr(&str14, str14_c);
 
-    my_str_insert(&str13, &str14, -5);
+    my_str_insert(&str13, &str14, (size_t)-5);
     printf("%s\n", str13.data);
 
     printf("Inserted C string 'trying to study POK' in into the position 13 in string '%s': ", str13.data);
@@ -145,6 +146,18 @@ int main(int argc, char *argv[]) {
     printf("Now run function that uses our library.\n");
     read_write(file_read, file_write);
     printf("Created by Sofiya, Oksana, Yarka, Anastasia.\nWith love <3.");
+
+
+    my_str_free(&str2);
+    my_str_free(&str3);
+    my_str_free(&str4);
+    my_str_free(&str6);
+    my_str_free(&str7);
+    my_str_free(&str8);
+    my_str_free(&str9);
+    my_str_free(&str10);
+    my_str_free(&str13);
+
     return 0;
 
 }

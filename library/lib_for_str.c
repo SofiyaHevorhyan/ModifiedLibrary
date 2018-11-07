@@ -46,12 +46,32 @@ int my_str_create(my_str_t *str, size_t buf_size) {
 //! Замість:
 //! int my_str_from_cstr(my_str_t* str, const char* cstr, size_t buf_size);
 //! настуна функція, яка збільшує стрічку до потрібного розміру:
-int new_my_str_from_cstr(my_str_t* str, const char* cstr) {
-    // Sofiya
+int my_str_from_cstr(my_str_t* str, const char* cstr) {
+
+    size_t len = len_c_str(cstr);
+
+    if (str->capacity_m < len) {
+        // make clear in case non-empty str to optimize time for reserve
+        // old values will be lost anyway
+        my_str_clear(str);
+        int status = my_str_reserve(str, 2*str->capacity_m);
+        if (!status) {
+            return -2;
+    }
+
+    const char *ps = cstr;
+    char *pstr = str->data;
+
+    while (*ps++ != '\0') {
+        *pstr++ = *(ps - 1);
+        str->size_m++;
+    }
+    *pstr = '\0';
+    }
     return 0;
 }
-// todo: стара функція!!! переписати!
-int my_str_from_cstr(my_str_t *str, const char *cstr, size_t buf_size) {
+
+int old_my_str_from_cstr(my_str_t *str, const char *cstr, size_t buf_size) {
     size_t len = len_c_str(cstr);
     if (buf_size == 0) {
         buf_size = len;
@@ -159,7 +179,6 @@ int my_str_popback(my_str_t *str) {
 //! Старий вміст стрічки перед тим звільняє, за потреби.
 // int my_str_copy(const my_str_t* from,  my_str_t* to, int reserve);
 // TODO: change this function
-// Sofiya
 int my_str_copy(const my_str_t *from, my_str_t *to, int reserve) {
     if (from->capacity_m != to->capacity_m) {
         if (reserve || (from->size_m > to->capacity_m)) {
@@ -259,23 +278,29 @@ int my_str_insert_cstr(my_str_t *str, const char *from, size_t pos) {
 }
 
 //! Додати стрічку в кінець.
-//! Якщо це неможливо, повертає -1, інакше 0.
-// TODO: change this function
-// Sofiya
-// int my_str_append(my_str_t* str, const my_str_t* from);
+//! Якщо помилка при спробі виділити пам'ть, повертає -1, інакше 0.
 int my_str_append(my_str_t *str, const my_str_t *from) {
-    if (str->size_m + from->size_m <= str->capacity_m) {
-        char *pstr = str->data + str->size_m;
-        const char *pfrom = from->data;
+    if (str->size_m + from->size_m > str->capacity_m) {
 
-        while (*pfrom++ != '\0') {
-            *pstr++ = *(pfrom - 1);
-            str->size_m++;
+        size_t buf_size = 2*str->capacity_m;
+        if (from->size_m > 2*str->capacity_m) {
+            buf_size = from->size_m;
         }
-        *pstr = '\0';
-        return 0;
+        int status = my_str_reserve(str, buf_size);
+        if (!status) {
+            return -1;
+        }
     }
-    return -1;
+
+    char *pstr = str->data + str->size_m;
+    const char *pfrom = from->data;
+
+    while (*pfrom++ != '\0') {
+        *pstr++ = *(pfrom - 1);
+        str->size_m++;
+    }
+    *pstr = '\0';
+    return 0;
 }
 
 //! Додати С-стрічку в кінець.
@@ -467,7 +492,7 @@ int my_str_read_word(my_str_t *str, FILE *file) {
         if (word_size < 1) {
             return -1;
         }
-        my_str_from_cstr(str, c_str, 0);
+        my_str_from_cstr(str, c_str);
         return 0;
     }
     return -1;
@@ -531,10 +556,34 @@ int my_str_reorder(my_str_t *str, size_t key_take, size_t key_put) {
 //! Для збільшення виділяє новий буфер, копіює вміст
 //! стрічки (size_m символів -- немає сенсу копіювати
 //! решту буфера) із старого буфера та звільняє його.
+// 0 for successful reserving buffer or all the same (no need to reserve)
+// -1 for smth went wrong
 int my_str_reserve(my_str_t* str, size_t buf_size) {
-    // Sofiya
+
+    if (str->capacity_m < buf_size) {
+
+        // create template for new stt
+        char *data1 = (char *) malloc(sizeof(char) * (buf_size + 1));
+
+        if (!data1) {
+            return -1;
+        }
+
+        size_t size_m = str->size_m;
+        my_str_substr_cstr(str, data1, 0, size_m);
+
+        // destroy old str
+        my_str_free(str);
+
+        // refresh old str to new one with new buf_size
+        str->size_m = size_m;
+        str->capacity_m = buf_size;
+        str->data = data1;
+
+    }
     return 0;
 }
+
 
 //! Робить буфер розміром, рівний необхідному:
 //! так, щоб capacity_m == size_t. Єдиний "офіційний"
