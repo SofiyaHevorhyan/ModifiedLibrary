@@ -55,7 +55,7 @@ int my_str_from_cstr(my_str_t* str, const char* cstr) {
         // old values will be lost anyway
         my_str_clear(str);
         int status = my_str_reserve(str, 2 * str->capacity_m);
-        if (!status) {
+        if (status) {
             return -2;
         }
     }
@@ -286,7 +286,7 @@ int my_str_append(my_str_t *str, const my_str_t *from) {
             buf_size = from->size_m;
         }
         int status = my_str_reserve(str, buf_size);
-        if (!status) {
+        if (status) {
             return -1;
         }
     }
