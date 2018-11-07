@@ -55,9 +55,10 @@ int my_str_from_cstr(my_str_t* str, const char* cstr) {
         // make clear in case non-empty str to optimize time for reserve
         // old values will be lost anyway
         my_str_clear(str);
-        int status = my_str_reserve(str, 2*str->capacity_m);
-        if (!status) {
+        int status = my_str_reserve(str, 2 * str->capacity_m);
+        if (status) {
             return -2;
+        }
     }
 
     const char *ps = cstr;
@@ -68,7 +69,7 @@ int my_str_from_cstr(my_str_t* str, const char* cstr) {
         str->size_m++;
     }
     *pstr = '\0';
-    }
+
     return 0;
 }
 
@@ -179,7 +180,6 @@ int my_str_popback(my_str_t *str) {
 //! інакше -- із буфером мінімального достатнього розміру.
 //! Старий вміст стрічки перед тим звільняє, за потреби.
 // int my_str_copy(const my_str_t* from,  my_str_t* to, int reserve);
-// TODO: change this function
 int my_str_copy(const my_str_t *from, my_str_t *to, int reserve) {
     if (from->capacity_m != to->capacity_m) {
         if (reserve || (from->size_m > to->capacity_m)) {
@@ -286,7 +286,7 @@ int my_str_append(my_str_t *str, const my_str_t *from) {
             buf_size = from->size_m;
         }
         int status = my_str_reserve(str, buf_size);
-        if (!status) {
+        if (status) {
             return -1;
         }
     }
