@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
     my_str_from_cstr(&str20, str20_c);
     my_str_resize(&str20, 18, 'a');
     printf("Resizing string adding char 'a': %s\n", str20.data);
-
+//    printf("sizeeeee %d\n", str20.size_m);
     char to[]="blablalbla";
     my_str_substr_cstr(&str20, to, 0, 6);
     printf("Copying [0:6) elements from previous string: %s\n", to);

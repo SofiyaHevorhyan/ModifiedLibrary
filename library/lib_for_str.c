@@ -596,6 +596,7 @@ int my_str_resize(my_str_t *str, size_t new_size, char sym) {
         }
         *(str->data + new_size + 1) = '\0';
     }
+    str->size_m = new_size;
     return 0;
 }
 
