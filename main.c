@@ -217,7 +217,12 @@ int main(int argc, char *argv[]) {
     printf("%s\n", str23.data);
     printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
     //----------------------------------------------------------------------------------------
-
+    printf("Testing shrink_to_fit function...");
+    my_str_shrink_to_fit(&str23);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
+    printf("%s\n", str23.data);
+    
+    
     my_str_t reading;
     my_str_create(&reading, 7);
     FILE *file = fopen(file_read, "r");
