@@ -625,6 +625,11 @@ int my_str_resize(my_str_t* str, size_t new_size, char sym) {
 //! whitespace, читає по вказаний delimiter, за потреби
 //! збільшує стрічку.
 int my_str_read_file_delim(my_str_t* str, FILE* file, char delimiter) {
-    // Oksi
+    char c = (char) getc(file);
+    while (c != delimiter) {
+        int status = my_str_pushback(str, c);
+        if (status) { return -1; }
+        c = (char) getc(file);
+    }
     return 0;
 }
