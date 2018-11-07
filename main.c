@@ -4,19 +4,20 @@
 int static compare(char c);
 
 int main(int argc, char *argv[]) {
+
     if (argc != 3) {
-        printf("Number of arguments must be 3 (program name, file_in, file_out.");
+        printf("Number of arguments must be 3 (program name, file_in, file_out)");
         return -1;
     }
 
-
     char *file_read = argv[1];
     char *file_write = argv[2];
-    printf("Program starts!\n");
-    my_str_t str;
 
+    printf("Program starts!\n");
+
+    my_str_t str;
     printf("Creating a string with buffer size 3...\n");
-    my_str_create(&str, 128);
+    my_str_create(&str, 3);
 
     printf("Creating a C string: ");
     const char *line = "girls";
@@ -25,22 +26,20 @@ int main(int argc, char *argv[]) {
     printf("Recreating string from C string with buffer 6...\n");
     my_str_from_cstr(&str, line);
     printf("Created string: %s\n", str.data);
-    if (my_str_empty(&str) == 1) {
-        printf("Size of the string is %d, size of the buffer is %d, it is empty: %s.\n", my_str_size(&str),
-               my_str_capacity(&str), "yes");
+
+    printf("Size of the string is %d, size of the buffer is %d, it is empty: ", my_str_size(&str), my_str_capacity(&str));
+    if (my_str_empty(&str)) {
+        printf("yes.\n");
     } else {
-        printf("Size of the string is %d, size of the buffer is %d, it is empty: %s.\n", my_str_size(&str),
-               my_str_capacity(&str), "no");
+        printf("no\n");
     }
 
     my_str_clear(&str);
-    printf("Clearing string...\nSize of the string is %d and size of the buffer is %d.\n", my_str_size(&str),
-           my_str_capacity(&str));
-
+    printf("Clearing string...\nSize of the string is %d and size of the buffer is %d.\n", my_str_size(&str), my_str_capacity(&str));
     my_str_free(&str);
     printf("Freeing string...\nSize of the string is %d and size of the buffer is %d.\n\n", my_str_size(&str),my_str_capacity(&str));
-    printf("Creating a new string...\n");
 
+    printf("Creating a new string...\n");
     my_str_t str2;
     my_str_create(&str2, 128);
     const char *str2_c = "R love POK";
@@ -83,10 +82,11 @@ int main(int argc, char *argv[]) {
 
     printf("Appending C string to the end of another string...\n");
     const char *str5_c = " very much";
+    printf("%s| %s ljl\n", str4.data, str5_c);
     my_str_append_cstr(&str4, str5_c);
     printf("String to which str3 was appended: %s\n", str4.data);
     const char *str6_c = my_str_get_cstr(&str4);
-    printf("Getting equal c string: %s\n", str6_c);
+    printf("Getting equal c string: %s\n\n", str6_c);
 
     printf("Number of element 'A' in string: '%s' is %d\n", str4.data, my_str_find_c(&str4, 'A', (size_t) 1));
 
@@ -145,8 +145,6 @@ int main(int argc, char *argv[]) {
 
     printf("Now run function that uses our library.\n");
     read_write(file_read, file_write);
-    printf("Created by Sofiya, Oksana, Yarka, Anastasia.\nWith love <3.");
-
 
     my_str_free(&str2);
     my_str_free(&str3);
@@ -158,8 +156,74 @@ int main(int argc, char *argv[]) {
     my_str_free(&str10);
     my_str_free(&str13);
 
-    return 0;
+    my_str_t str20;
+    my_str_create(&str20, 256);
+    const char *str20_c = "We did it... ";
+    my_str_from_cstr(&str20, str20_c);
+    my_str_resize(&str20, 18, 'a');
+    printf("Resizing string adding char 'a': %s\n", str20.data);
+    char to[]="blablalbla";
+    my_str_substr_cstr(&str20, to, 0, 6);
+    printf("Copying [0:6) elements from previous string: %s\n", to);
 
+    const char *str21_c = "Hooray... ";
+    my_str_insert_cstr(&str20, str21_c, 0);
+    printf("Inserting C string to the previous string: %s\n", str20.data);
+
+
+    my_str_t new_str;
+    my_str_create(&new_str, 7);
+    const char *line1 = "student";
+    my_str_from_cstr(&new_str, line1);
+    printf("Testing reserve function. String: %s, ", new_str.data);
+    printf("buffer - %d\n", my_str_capacity(&new_str));
+    my_str_reserve(&new_str, 10);
+    printf("buffer after reserve - %d ", my_str_capacity(&new_str));
+    printf("String: %s\n", new_str.data);
+
+    // TODO: але якщо минулі тести в інший файл кидати будемо то str22 і str23 можна і перейменувати норм
+    // а так то тести до тих двох ф-цій готові :-)
+    // ------------------------------- pushback ---------------------------------------------
+    printf("Testing pushback function...\n");
+    my_str_t str22;
+    my_str_create(&str22, 7);
+
+    const char *word = "Student";
+    my_str_from_cstr(&str22, word);
+
+    printf("Created string: %s\n", str22.data);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str22), my_str_capacity(&str22));
+
+    printf("Added a symbol to the end: ");
+    my_str_pushback(&str22, 's');
+    printf("%s\n", str22.data);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str22), my_str_capacity(&str22));
+    printf("\n");
+    //----------------------------------------------------------------------------------------
+
+
+    // ------------------------------insert_c function----------------------------------------
+    printf("Testing insert_c function...\n");
+    my_str_t str23;
+    my_str_create(&str23, 4);
+
+    const char *word2 = "Mow!";
+    my_str_from_cstr(&str23, word2);
+
+    printf("Created string: %s\n", str23.data);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
+    printf("Insert a symbol on the position 1: ");
+    my_str_insert_c(&str23, 'e', 1);
+    printf("%s\n", str23.data);
+    printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
+    //----------------------------------------------------------------------------------------
+
+
+
+    printf("Created by Sofiya, Oksana, Yarka, Anastasia.\nWith love <3.");
+
+
+    return 0;
 }
 
 int static compare(char c) {

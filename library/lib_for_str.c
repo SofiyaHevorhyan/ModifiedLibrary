@@ -46,7 +46,8 @@ int my_str_create(my_str_t *str, size_t buf_size) {
 //! Замість:
 //! int my_str_from_cstr(my_str_t* str, const char* cstr, size_t buf_size);
 //! настуна функція, яка збільшує стрічку до потрібного розміру:
-int my_str_from_cstr(my_str_t* str, const char* cstr) {
+
+int my_str_from_cstr(my_str_t *str, const char *cstr) {
 
     size_t len = len_c_str(cstr);
 
@@ -54,7 +55,11 @@ int my_str_from_cstr(my_str_t* str, const char* cstr) {
         // make clear in case non-empty str to optimize time for reserve
         // old values will be lost anyway
         my_str_clear(str);
-        int status = my_str_reserve(str, 2 * str->capacity_m);
+        size_t buf_size = 2*str->capacity_m;
+        if (len > buf_size) {
+            buf_size = len;
+        }
+        int status = my_str_reserve(str, buf_size);
         if (status) {
             return -2;
         }
@@ -70,31 +75,6 @@ int my_str_from_cstr(my_str_t* str, const char* cstr) {
     *pstr = '\0';
 
     return 0;
-}
-
-int old_my_str_from_cstr(my_str_t *str, const char *cstr, size_t buf_size) {
-    size_t len = len_c_str(cstr);
-    if (buf_size == 0) {
-        buf_size = len;
-    }
-
-    if (buf_size < len) {
-        return -1;
-    }
-    my_str_free(str);
-    int status = my_str_create(str, buf_size);
-    if (!status) {
-        const char *ps = cstr;
-        char *pstr = str->data;
-
-        while (*ps++ != '\0') {
-            *pstr++ = *(ps - 1);
-            str->size_m++;
-        }
-        *pstr = '\0';
-        return 0;
-    }
-    return -2;
 }
 
 
@@ -149,17 +129,17 @@ int my_str_putc(my_str_t *str, size_t index, char c) {
 
 //! Додає символ в кінець.
 //! Повертає 0, якщо успішно, -1, якщо буфер закінчився.
-// TODO: change this function!
-// Nastia
 // int my_str_pushback(my_str_t* str, char c);
 int my_str_pushback(my_str_t *str, char c) {
-    if (str->size_m < str->capacity_m) {
-        *(str->data + str->size_m) = c;
-        *(str->data + str->size_m + 1) = '\0';
-        str->size_m++;
-        return 0;
+    while (str->size_m >= str->capacity_m) {
+        my_str_reserve(str, str->capacity_m * 2);
     }
-    return -1;
+    
+    *(str->data + str->size_m) = c;
+    *(str->data + str->size_m + 1) = '\0';
+    str->size_m++;
+
+    return 0;
 }
 
 //! Викидає символ з кінця.
@@ -210,70 +190,65 @@ void my_str_clear(my_str_t *str) {
 
 //! Вставити символ у стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
-// TODO: change this function
-// Nastia
 // int my_str_insert_c(my_str_t* str, char c, size_t pos);
 int my_str_insert_c(my_str_t *str, char c, size_t pos) {
     if (pos > str->size_m) { pos = str->size_m; }
 
-    if (str->size_m < str->capacity_m){
-
-        char* p = str->data + pos;
-        char x1 = c, x2 = *p;
-
-        while(p <= str->data + str->size_m){
-            *p  = x1;
-            x1 = x2;
-            x2 = *(++p);
-        }
-        *p = '\0';
-        str->size_m += 1;
-        return 0;
+    while (str->size_m >= str->capacity_m) {
+        my_str_reserve(str, str->capacity_m * 2);
     }
-    return -1;
+
+    char* p = str->data + pos;
+    char x1 = c, x2 = *p;
+    while(p <= str->data + str->size_m){
+        *p  = x1;
+        x1 = x2;
+        x2 = *(++p);
+    }
+    *p = '\0';
+    str->size_m += 1;
+    return 0;
 }
 
 //! Вставити стрічку в заданій позиції, змістивши решту символів праворуч.
+//! Якщо це неможливо, повертає -1, інакше 0.
 // TODO: change this function
+// Oksi
+// int my_str_insert(my_str_t* str, const my_str_t* from, size_t pos);
 int my_str_insert(my_str_t *str, const my_str_t *from, size_t pos) {
     if (pos > str->size_m) { pos = str->size_m; }
 
-    while (from->size_m + str->size_m > str->capacity_m) {
-        if (my_str_reserve(str, 2 * str->capacity_m)) {
-            return -1;
+    if (from->size_m + str->size_m <= str->capacity_m) {
+        for (size_t i = str->size_m + from->size_m + 1; i >= pos + from->size_m; i--) {
+            *(str->data + i) = *(str->data + i - from->size_m);
         }
-    }
-    for (size_t i = str->size_m + from->size_m + 1; i >= pos + from->size_m; i--) {
-        *(str->data + i) = *(str->data + i - from->size_m);
-    }
-    for (size_t i = 0; i < from->size_m; i++) {
-        *(str->data + pos + i) = *(from->data + i);
-    }
+        for (size_t i = 0; i < from->size_m; i++) {
+            *(str->data + pos + i) = *(from->data + i);
+        }
 
-    str->size_m += from->size_m;
-    return 0;
+        str->size_m += from->size_m;
+        return 0;
+    }
+    return -1;
 }
 
 //! Вставити C-стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
-// TODO: change this function
-// Yarka
-// int my_str_insert_cstr(my_str_t* str, const char* from, size_t pos);
 int my_str_insert_cstr(my_str_t *str, const char *from, size_t pos) {
     size_t size_from = len_c_str(from);
     if (pos > str->size_m) { pos = str->size_m; }
-
-    if (size_from + str->size_m <= str->capacity_m) {
-        for (size_t i = str->size_m + 2*size_from; i >= pos + size_from; i--) {
-            *(str->data + i) = *(str->data + i - size_from);
-        }
-        for (size_t i = 0; i < size_from; i++) {
-            *(str->data + pos + i) = *(from + i);
-        }
-        str->size_m += size_from;
-        return 0;
+    while (size_from + str->size_m >= str->capacity_m) {
+        my_str_reserve(str, str->capacity_m * 2);
     }
-    return -1;
+
+    for (size_t i = str->size_m + 2 * size_from; i >= pos + size_from; i--) {
+        *(str->data + i) = *(str->data + i - size_from);
+    }
+    for (size_t i = 0; i < size_from; i++) {
+        *(str->data + pos + i) = *(from + i);
+    }
+    str->size_m += size_from;
+    return 0;
 }
 
 //! Додати стрічку в кінець.
@@ -282,10 +257,11 @@ int my_str_append(my_str_t *str, const my_str_t *from) {
     if (str->size_m + from->size_m > str->capacity_m) {
 
         size_t buf_size = 2*str->capacity_m;
-        if (from->size_m > 2*str->capacity_m) {
-            buf_size = from->size_m;
+        if (from->size_m + str->size_m > 2*str->capacity_m) {
+            buf_size = from->size_m + str->size_m;
         }
         int status = my_str_reserve(str, buf_size);
+
         if (status) {
             return -1;
         }
@@ -305,15 +281,11 @@ int my_str_append(my_str_t *str, const my_str_t *from) {
 //! Додати С-стрічку в кінець.
 //! Якщо це неможливо, повертає -1, інакше 0.
 // TODO: change this function
+// todo: check if tests in main are correct
+// Oksi
+// int my_str_append_cstr(my_str_t* str, const char* from);
 int my_str_append_cstr(my_str_t *str, const char *from) {
-    int status = 0;
-    if (str->size_m + len_c_str(from) > str->capacity_m) {
-        status = my_str_reserve(str, 2 * str->capacity_m);
-    }
-    if (str->size_m + len_c_str(from) > str->capacity_m) {
-        status = my_str_reserve(str, str->size_m + len_c_str(from));
-    }
-    if (!status) {
+    if (str->size_m + len_c_str(from) <= str->capacity_m) {
         char *pstr = str->data + str->size_m;
         const char *pfrom = from;
 
@@ -333,13 +305,13 @@ int my_str_append_cstr(my_str_t *str, const char *from) {
 int my_str_cmp(my_str_t *str, const char *from) {
     size_t len = len_c_str(from);
 
-    char* pstr = str->data;
-    const char* pfrom = from;
+    char *pstr = str->data;
+    const char *pfrom = from;
 
     while (*pstr++ != '\0' || *pfrom++ != '\0') {
-        if (*(pstr-1) > *(pfrom-1)) {
+        if (*(pstr - 1) > *(pfrom - 1)) {
             return 1;
-        } else if (*(pstr-1) < *(pfrom-1)) {
+        } else if (*(pstr - 1) < *(pfrom - 1)) {
             return -1;
         }
     }
@@ -353,15 +325,14 @@ int my_str_cmp(my_str_t *str, const char *from) {
 
 //! Скопіювати підстрічку, із beg включно, по end не включно ([beg, end)).
 //! Якщо end виходить за межі str -- скопіювати скільки вдасться, не вважати
-//! це помилкою. Якщо ж в ціловій стрічці замало місця - збільшити розмір буферу, якщо beg більший
+//! це помилкою. Якщо ж в ціловій стрічці замало місця, або beg більший
 //! за розмір str -- це помилка. Повернути відповідний код завершення.
 // TODO: change this function
+// Oksi
+// int my_str_substr(const my_str_t* str, my_str_t* to, size_t beg, size_t end);
 int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end) {
-    if (beg > str->size_m) {
+    if (((end - beg) > to->capacity_m) || (beg > str->size_m)) {
         return -1;
-    }
-    while (to->capacity_m < (end - beg)) {
-        my_str_reserve(to, 2*to->capacity_m);
     }
     to->size_m = 0;
     for (size_t i = beg; i < end; i++) {
@@ -378,23 +349,19 @@ int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end) {
 
 //! Її C-string варіант. Враховуючи пізні зміни інтерфейсу, прийнятним
 //! Буде і попередній варіант.
-// TODO: write this function
-// Yarka
 int my_str_substr_cstr(const my_str_t *str, char *to, size_t beg, size_t end) {
-    if (beg > str->size_m) {
+    if (beg > str->size_m || end < beg) {
         return -1;
     }
     for (size_t i = beg; i < end; i++) {
-
-        *(to + i - beg) = *(str->data + i);
         if (*(str->data + i) == '\0') {
             break;
         }
+        *(to + i - beg) = *(str->data + i);
     }
     *(to + end - beg) = '\0';
     return 0;
 }
-
 
 //! Повернути вказівник на С-стрічку, еквівалентну str.
 //! Вважатимемо, що змінювати цю С-стрічку заборонено.
@@ -479,13 +446,13 @@ size_t my_str_find_if(const my_str_t *str, int (*predicat)(char)) {
 //! слід не давати читанню вийти за межі буфера!
 //! Рекомендую скористатися fgets().
 size_t my_str_read_file(my_str_t *str, FILE *file) {
-    if(file == NULL) {
-        return (size_t )-1u;
+    if (file == NULL) {
+        return (size_t) -1u;
     }
 
-    char* arr = str->data;
-    if (fgets(arr, str->capacity_m+1, file) == NULL) {
-        return (size_t)-1u;
+    char *arr = str->data;
+    if (fgets(arr, str->capacity_m + 1, file) == NULL) {
+        return (size_t) -1u;
     }
 
     str->size_m = len_c_str(arr);
@@ -574,12 +541,13 @@ int my_str_reorder(my_str_t *str, size_t key_take, size_t key_put) {
 //! решту буфера) із старого буфера та звільняє його.
 // 0 for successful reserving buffer or all the same (no need to reserve)
 // -1 for smth went wrong
-int my_str_reserve(my_str_t* str, size_t buf_size) {
+int my_str_reserve(my_str_t *str, size_t buf_size) {
 
     if (str->capacity_m < buf_size) {
 
         // create template for new stt
-        char *data1 = (char *) malloc(sizeof(char) * (buf_size + 1));
+        char *data1 = (char*) malloc(sizeof(char) * (buf_size + 1));
+        //printf("reserve: %p %c\n", (void*)data1, *data1);
 
         if (!data1) {
             return -1;
@@ -597,6 +565,7 @@ int my_str_reserve(my_str_t* str, size_t buf_size) {
         str->data = data1;
 
     }
+
     return 0;
 }
 
@@ -604,7 +573,7 @@ int my_str_reserve(my_str_t* str, size_t buf_size) {
 //! Робить буфер розміром, рівний необхідному:
 //! так, щоб capacity_m == size_t. Єдиний "офіційний"
 //! спосіб зменшити фактичний розмір буфера.
-int my_str_shrink_to_fit(my_str_t* str) {
+int my_str_shrink_to_fit(my_str_t *str) {
     // Nastia
     return 0;
 }
@@ -615,21 +584,29 @@ int my_str_shrink_to_fit(my_str_t* str) {
 //! встановлюючи нові символи рівними sym.
 //! За потреби, збільшує буфер.
 //! Сподіваюся, різниця між розміром буфера та фактичним
-//! розміром стрічки зрозуміла?
-int my_str_resize(my_str_t* str, size_t new_size, char sym) {
-    // Yarka
+//! розміром стрічки зрозуміла?)
+int my_str_resize(my_str_t *str, size_t new_size, char sym) {
+    while (str->capacity_m < new_size) {
+        my_str_reserve(str, str->capacity_m * 2);
+    }
+
+    if (new_size < str->size_m) {
+        *(str->data + new_size) = '\0';
+        str->size_m = new_size;
+    } else {
+        for (size_t i = 0; i < (new_size - str->size_m); i++) {
+            *(str->data + str->size_m + i) = sym;
+        }
+        *(str->data + new_size + 1) = '\0';
+    }
+    str->size_m = new_size;
     return 0;
 }
 
 //! На відміну від my_str_read_file(), яка читає по
 //! whitespace, читає по вказаний delimiter, за потреби
 //! збільшує стрічку.
-int my_str_read_file_delim(my_str_t* str, FILE* file, char delimiter) {
-    char c = (char) getc(file);
-    while (c != delimiter) {
-        int status = my_str_pushback(str, c);
-        if (status) { return -1; }
-        c = (char) getc(file);
-    }
+int my_str_read_file_delim(my_str_t *str, FILE *file, char delimiter) {
+    // Oksi
     return 0;
 }
