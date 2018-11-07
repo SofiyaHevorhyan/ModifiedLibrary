@@ -233,8 +233,6 @@ int my_str_insert(my_str_t *str, const my_str_t *from, size_t pos) {
 
 //! Вставити C-стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
-// TODO: change this function
-// Yarka
 int my_str_insert_cstr(my_str_t *str, const char *from, size_t pos) {
     size_t size_from = len_c_str(from);
     if (pos > str->size_m) { pos = str->size_m; }
