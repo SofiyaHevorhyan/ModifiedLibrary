@@ -129,7 +129,6 @@ int my_str_putc(my_str_t *str, size_t index, char c) {
 
 //! Додає символ в кінець.
 //! Повертає 0, якщо успішно, -1, якщо буфер закінчився.
-// int my_str_pushback(my_str_t* str, char c);
 int my_str_pushback(my_str_t *str, char c) {
     while (str->size_m > str->capacity_m) {
         if (my_str_reserve(str, str->capacity_m * 2)) { return -1; }
@@ -190,12 +189,11 @@ void my_str_clear(my_str_t *str) {
 
 //! Вставити символ у стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
-// int my_str_insert_c(my_str_t* str, char c, size_t pos);
 int my_str_insert_c(my_str_t *str, char c, size_t pos) {
     if (pos > str->size_m) { pos = str->size_m; }
 
-    while (str->size_m >= str->capacity_m) {
-        my_str_reserve(str, str->capacity_m * 2);
+    while (str->size_m > str->capacity_m) {
+        if (my_str_reserve(str, str->capacity_m * 2)) { return -1; }
     }
 
     char* p = str->data + pos;
@@ -277,7 +275,6 @@ int my_str_append(my_str_t *str, const my_str_t *from) {
 
 //! Додати С-стрічку в кінець.
 //! Якщо це неможливо, повертає -1, інакше 0.
-// todo: check if tests in main are correct
 int my_str_append_cstr(my_str_t *str, const char *from) {
     size_t min_size = str->size_m + len_c_str(from);
     if ( min_size > str->capacity_m) {
