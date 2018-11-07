@@ -218,6 +218,15 @@ int main(int argc, char *argv[]) {
     printf("Size - %d, Buffer - %d\n", my_str_size(&str23), my_str_capacity(&str23));
     //----------------------------------------------------------------------------------------
 
+    my_str_t reading;
+    my_str_create(&reading, 7);
+    FILE *file = fopen(file_read, "r");
+    if (file == NULL) {
+        printf("\nEmpty file to read str! \n");
+        return -1;
+    }
+    my_str_read_file_delim(&reading, file, '"');
+    printf("Read from file until '': %s", reading.data);
 
 
     printf("Created by Sofiya, Oksana, Yarka, Anastasia.\nWith love <3.");
