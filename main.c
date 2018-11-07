@@ -9,7 +9,20 @@ int main(int argc, char *argv[]) {
         printf("Number of arguments must be 3 (program name, file_in, file_out.");
         return -1;
     }
-
+    
+    //TODO: Sofia
+    // дивися, викликали reserve, буфер збільшився, але стрічка не виводиться, чи то я щось не то роблю?
+    my_str_t new_str;
+    my_str_create(&new_str, 7);
+    const char *l = "student";
+    my_str_from_cstr(&new_str, l);
+    printf("String: %s\n", new_str.data); // тут фсьо харасьо, бо виводиться
+    printf("buffer - %d\n", my_str_capacity(&new_str));
+    my_str_reserve(&new_str, 10);
+    printf("buffer after reserve - %d\n", my_str_capacity(&new_str));
+    printf("String: %s\n", new_str.data); // а тут не виводиться :-((
+    
+    //---------------------------------------------------------------------------
 
     char *file_read = argv[1];
     char *file_write = argv[2];
